@@ -1,4 +1,4 @@
-import urllib, zipfile, os, sys, glob
+import urllib, zipfile, os, sys, glob, random
 
 #Specifying formats, and download and subtitle string
 FORMAT = ['.mp4', '.avi', '.mkv']
@@ -7,7 +7,7 @@ SUBTITLE = '/subtitles/'
 
 #Specifying variables to be used in the script
 lang = 'english'
-directory = os.getcwd() + '/tmp'
+directory = os.getcwd() + '/tmp' + str(random.randint(10000, 99999))
 path = os.getcwd()
 files = glob.glob("*")
 torrentURL = ""
@@ -84,7 +84,15 @@ url = test.geturl()
 
 #Get, unzip and delete
 subT = urllib.URLopener()
-subT.retrieve(url, directory)
+
+error = True
+while error:
+	try:
+		subT.retrieve(url, directory)
+		error = False
+	except IOError:
+		directory.replace(directory[-5:], str(random.randint(10000, 99999)))
+
 ziptest = zipfile.ZipFile(directory)
 ziptest.extractall(path)
 os.remove(directory)
