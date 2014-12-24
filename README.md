@@ -1,7 +1,7 @@
 SubPy
 =====
 
-A fast CLI-based script for downloading subtitles from Subscene.
+A fast CLI-based script for downloading subtitles from Subscene. Written and tested using Python 2.7.8.
 
 
 ## How to use:
