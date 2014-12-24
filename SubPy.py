@@ -56,8 +56,26 @@ def filterURL(siteList, phrase):
 			urlList.append(l[6:-1])
 	return urlList
 
+#Print help and exit
+def printHelp():
+	print '\n', 'Help for SubPy'
+	print 'Run this script within the directory of the movie you wish to download subtitles for.'
+	print 'Run with the argument "-lang=<your-language>" to get a subtitle of that language.'
+	sys.exit()
+
 ##### MAIN PART OF SCRIPT #####
-print "Searching for: " + torrentName
+for arg in sys.argv:
+	#If help is given as argument, print help and exit
+	if arg == '-h' or arg == '--help':
+		printHelp()
+	elif '-lang=' in arg:
+		lang = arg.replace('-lang=', '')
+
+if torrentName == '<No file>':
+	print "No video file in directory"
+	sys.exit()
+else:
+	print "Searching for: " + lang + ' - "' + torrentName + '"'
 
 #Find and add all valid URL's to a list
 site = urllib.urlopen(torrentURL)
@@ -67,10 +85,15 @@ removeTags(tList)
 urlList = filterURL(tList, SUBTITLE)
 
 #Find the correct language
+subURL = ''
 for url in urlList:
 	if lang in url:
 		subURL = 'http://www.subscene.com' + url[:-1]
 		break
+
+if subURL == '':
+	print 'No subtitle available in that language'
+	sys.exit()
 
 #Get download-URL
 subSite = urllib.urlopen(subURL)
