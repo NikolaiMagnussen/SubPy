@@ -7,19 +7,10 @@ SUBTITLE = '/subtitles/'
 
 #Specifying variables to be used in the script
 lang = 'english'
-directory = os.getcwd() + '/tmp' + str(random.randint(10000, 99999))
 path = os.getcwd()
-files = glob.glob("*")
+directory = path + '/tmp' + str(random.randint(10000, 99999))
 torrentURL = ""
 torrentName = "<No file>"
-for f in files:
-	for extension in FORMAT:
-		if  extension in f:
-			torrentName = f
-			torrentURL = 'http://www.subscene.com/subtitles/release?q=' + f.replace(extension, '') + '&r=true'
-			break
-	if len(torrentURL) != 0:
-		break
 
 #Function that check whether or not a word is in a list, and return 1 if in. 0 if not
 def wordInList(word, wList):
@@ -61,15 +52,39 @@ def printHelp():
 	print '\n', 'Help for SubPy'
 	print 'Run this script within the directory of the movie you wish to download subtitles for.'
 	print 'Run with the argument "-lang=<your-language>" to get a subtitle of that language.'
+	print 'Run with the argument "-path=<complete-path>" to find video files in that specific directory'
 	sys.exit()
+
+#Generate directory based on path
+def genDir(path):
+	return path + '/tmp' + str(random.randint(10000, 99999))
+
+#Generate torrentName
+def genTorrentName(path):
+	for f in os.listdir(path):
+		for  extension in FORMAT:
+			if extension in f:
+				return f.replace(extension, '')
+
+#Generate torrentURL
+def genTorrentURL(torrentName):
+	return 'http://www.subscene.com/subtitles/release?q=' + torrentName + '&r=true'
 
 ##### MAIN PART OF SCRIPT #####
 for arg in sys.argv:
 	#If help is given as argument, print help and exit
 	if arg == '-h' or arg == '--help':
 		printHelp()
-	elif '-lang=' in arg:
-		lang = arg.replace('-lang=', '')
+	else:
+	#If any of the other acceptable arguments are given
+		if '-lang=' in arg:
+			lang = arg.replace('-lang=', '')
+		if '-path=' in arg:
+			path = arg.replace('-path=', '')
+			directory = genDir(path)
+
+torrentName = genTorrentName(path)
+torrentURL = genTorrentURL(torrentName)
 
 if torrentName == '<No file>':
 	print "No video file in directory"
