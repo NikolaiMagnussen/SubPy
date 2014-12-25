@@ -19,6 +19,7 @@ def wordInList(word, wList):
 			return 1
 	return 0
 
+#dette er en test
 #Remove all unnecessary strings before and after the  table
 def removeTags(siteList):
 	i = 0
