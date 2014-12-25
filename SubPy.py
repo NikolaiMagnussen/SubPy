@@ -12,7 +12,7 @@ path = directory + '/tmp' + str(random.randint(10000, 99999))
 torrentURL = ""
 torrentName = "<No file>"
 
-#Function that check whether or not a word is in a list, and return 1 if in. 0 if not
+#Return 1 if the word is in the list, 0 if not.
 def wordInList(word, wList):
 	for w in wList:
 		if w == word:
@@ -39,7 +39,7 @@ def removeTags(siteList):
 		else:
 			break
 
-#Add valid subtitle URL's to a list
+#Add valid subtitle URL's to a list, and return it
 def filterURL(siteList, phrase):
 	urlList = []
 	for l in siteList:
@@ -61,10 +61,34 @@ def genPath(directory):
 
 #Generate torrentName
 def genTorrentName(directory):
+	tList = []
+	i = 1
 	for f in os.listdir(directory):
 		for  extension in FORMAT:
 			if extension in f:
-				return f.replace(extension, '')
+				tList.append(f.replace(extension, ''))
+	if len(tList) == 0:
+		print "No video file in directory"
+		sys.exit()
+	elif len(tList) == 1:
+	 	return tList[0]
+
+	while i <= len(tList):
+		print '[' + str(i) + '] ' + tList[i-1]
+		i += 1
+	
+	try:
+		idx = int(raw_input("Choose video: "))
+	except ValueError:
+		print "Invalid input!"
+		sys.exit()
+
+	if idx <= len(tList) and idx > 0:
+		return tList[idx-1]
+	else:
+		print "Invalid video number!"
+		sys.exit()
+	
 
 #Generate torrentURL
 def genTorrentURL(torrentName):
@@ -86,11 +110,11 @@ for arg in sys.argv:
 torrentName = genTorrentName(directory)
 torrentURL = genTorrentURL(torrentName)
 
-if torrentName == '<No file>':
-	print "No video file in directory"
-	sys.exit()
-else:
-	print "Searching for: " + lang + ' - "' + torrentName + '"'
+#if torrentName == '<No file>':
+#print "No video file in directory"
+#sys.exit()
+#else:
+print "Searching for: " + lang + ' - "' + torrentName + '"'
 
 #Find and add all valid URL's to a list
 site = urllib.urlopen(torrentURL)
