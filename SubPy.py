@@ -55,7 +55,7 @@ def printHelp():
 	print 'Run with the argument "-dir=<full_directory_path>" to find video files in an alternative directory.'
 	sys.exit()
 
-#Generate directory based on directory
+#Generate path based on directory
 def genPath(directory):
 	return directory + '/tmp' + str(random.randint(10000, 99999))
 
