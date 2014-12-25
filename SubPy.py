@@ -110,10 +110,6 @@ for arg in sys.argv:
 torrentName = genTorrentName(directory)
 torrentURL = genTorrentURL(torrentName)
 
-#if torrentName == '<No file>':
-#print "No video file in directory"
-#sys.exit()
-#else:
 print "Searching for: " + lang + ' - "' + torrentName + '"'
 
 #Find and add all valid URL's to a list

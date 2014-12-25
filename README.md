@@ -11,11 +11,11 @@ Run the script from the directory containing the movie. Run with -h/--help to di
 - Choose language
 - Choose alternative directory
 - Display help
+- List all video's in the chosen directory
 
 ### TODO:
 
 ##### Add support for:
 - List relevant subtitles so the user can choose which one to download.
-- List all movies if there are mulitple movies in the directory, so the user can choose which one to find subtitles for
 - Filtering based on "Hearing Impaired" subtitles
 - List the specific subtitle's score.
