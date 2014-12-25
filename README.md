@@ -5,15 +5,17 @@ A fast CLI-based script for downloading subtitles from Subscene. Written and tes
 
 
 ## How to use:
-Run the script from the directory containing the movie.
+Run the script from the directory containing the movie. Run with -h/--help to display help.
 
-## TODO:
-- ~~Implement possibility to choose other language than english~~
+### Features
+- Choose language
+- Choose alternative directory
+- Display help
+
+### TODO:
 
 ##### Add support for:
 - List relevant subtitles so the user can choose which one to download.
 - List all movies if there are mulitple movies in the directory, so the user can choose which one to find subtitles for
 - Filtering based on "Hearing Impaired" subtitles
 - List the specific subtitle's score.
-- ~~Supplying the script with the movie's directory instead of navigating there before running the script~~
-- ~~Add help argument(-h/--help)~~

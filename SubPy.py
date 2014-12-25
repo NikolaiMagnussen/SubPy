@@ -7,8 +7,8 @@ SUBTITLE = '/subtitles/'
 
 #Specifying variables to be used in the script
 lang = 'english'
-path = os.getcwd()
-directory = path + '/tmp' + str(random.randint(10000, 99999))
+directory = os.getcwd()
+path = directory + '/tmp' + str(random.randint(10000, 99999))
 torrentURL = ""
 torrentName = "<No file>"
 
@@ -49,19 +49,19 @@ def filterURL(siteList, phrase):
 
 #Print help and exit
 def printHelp():
-	print '\n', 'Help for SubPy'
+	print '\n', 'Help for SubPy:'
 	print 'Run this script within the directory of the movie you wish to download subtitles for.'
 	print 'Run with the argument "-lang=<your-language>" to get a subtitle of that language.'
-	print 'Run with the argument "-path=<complete-path>" to find video files in that specific directory'
+	print 'Run with the argument "-dir=<full_directory_path>" to find video files in an alternative directory.'
 	sys.exit()
 
-#Generate directory based on path
-def genDir(path):
-	return path + '/tmp' + str(random.randint(10000, 99999))
+#Generate directory based on directory
+def genPath(directory):
+	return directory + '/tmp' + str(random.randint(10000, 99999))
 
 #Generate torrentName
-def genTorrentName(path):
-	for f in os.listdir(path):
+def genTorrentName(directory):
+	for f in os.listdir(directory):
 		for  extension in FORMAT:
 			if extension in f:
 				return f.replace(extension, '')
@@ -79,11 +79,11 @@ for arg in sys.argv:
 	#If any of the other acceptable arguments are given
 		if '-lang=' in arg:
 			lang = arg.replace('-lang=', '')
-		if '-path=' in arg:
-			path = arg.replace('-path=', '')
-			directory = genDir(path)
+		if '-dir=' in arg:
+			directory = arg.replace('-dir=', '')
+			path = genPath(directory)
 
-torrentName = genTorrentName(path)
+torrentName = genTorrentName(directory)
 torrentURL = genTorrentURL(torrentName)
 
 if torrentName == '<No file>':
@@ -126,13 +126,13 @@ subT = urllib.URLopener()
 error = True
 while error:
 	try:
-		subT.retrieve(url, directory)
+		subT.retrieve(url, path)
 		error = False
 	except IOError:
-		directory.replace(directory[-5:], str(random.randint(10000, 99999)))
+		directory.replace(path[-5:], str(random.randint(10000, 99999)))
 
-ziptest = zipfile.ZipFile(directory)
-ziptest.extractall(path)
-os.remove(directory)
+ziptest = zipfile.ZipFile(path)
+ziptest.extractall(directory)
+os.remove(path)
 
 print "Subtitle downloaded!"
