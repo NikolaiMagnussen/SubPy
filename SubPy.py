@@ -9,6 +9,7 @@ MAXURL = 10
 #Specifying variables to be used in the script.
 skip = False
 lang = 'english'
+hi = "off"
 directory = os.getcwd()
 path = directory + '/tmp' + str(random.randint(10000, 99999))
 torrentURL = ""
@@ -44,14 +45,16 @@ def removeTags(siteList):
 			break
 
 #Add valid subtitles to a list. Each element consists of a list of two elements[name, url].
-def filterURL(siteList, phrase):
+def filterURL(siteList, phrase, hiFilter):
 	urlList = []
 	title = ""
 	i = 0
 	for l in siteList:
 		if l[:6] == 'href="' and phrase in l:
 			urlIdx = siteList.index(l)
-			while urlIdx  <= len(siteList):
+			hi = False
+			#Get title
+			while urlIdx  <= len(siteList) and phrase == SUBTITLE:
 				if siteList[urlIdx-1] == '<span>':
 					title = ""
 					while siteList[urlIdx] != '</span>':
@@ -60,14 +63,26 @@ def filterURL(siteList, phrase):
 					break
 				urlIdx += 1
 
+			#Get HI status
+			if phrase == SUBTITLE:
+				while siteList[urlIdx] != 'class="a41">' and siteList[urlIdx] != 'class="a40">':
+					urlIdx += 1
+				if siteList[urlIdx] == 'class="a41">':
+					hi = True
+
+
+			#Append subtitle to the list based on hiFilter
 			if title != "":
-				urlList.append([title, l[6:-2]])
+				if hiFilter == 'off':
+					urlList.append([title, l[6:-2], hi])
+				elif hiFilter == 'on' and hi:
+					urlList.append([title, l[6:-2], hi])
+				elif hiFilter == 'no' and not hi:
+					urlList.append([title, l[6:-2], hi])
+			#Appending download link
 			else:
 				urlList.append([l[6:-2]])
 			
-			if len(urlList) >= MAXURL:
-				break
-
 	return urlList
 
 #Print help and exit.
@@ -77,6 +92,7 @@ def printHelp():
 	print 'Run with the argument "-lang=<your-language>" to get a subtitle of that language, or all to display all subtitles.'
 	print 'Run with the argument "-dir=<full_directory_path>" to find video files in an alternative directory.'
 	print 'Run with the argument "-skip" to automatically choose the top-most subtitle.'
+	print 'Run with the argument "-hi=<on/no/off>" to only display HI, display no HI, or display both.'
 	sys.exit()
 
 #Generate path based on directory.
@@ -94,9 +110,12 @@ def chooseItem(iList, iType, nested):
 	i = 1
 	while i <= len(iList):
 		if nested:
-			print '[' + '{0:2d}'.format(i) + '] ' + iList[i-1][0]
+			if iList[i-1][2]:
+				print '[' + '{0:2d}'.format(i) + '] ' + iList[i-1][0] + ' - HI'
+			else:
+				print '[' + '{0:2d}'.format(i) + '] ' + iList[i-1][0]
 		else:
-			print '[' + str(i) + '] ' + iList[i-1]
+			print '[' + str(i) + '] ' + iList[i-1] 
 		i += 1
 	
 	try:
@@ -132,7 +151,9 @@ def genTorrentName(directory):
 def genTorrentURL(torrentName):
 	return 'http://www.subscene.com/subtitles/release?q=' + torrentName + '&r=true'
 
+###############################
 ##### MAIN PART OF SCRIPT #####
+###############################
 for arg in sys.argv:
 	#If help is given as argument, print help and exit.
 	if arg == '-h' or arg == '--help':
@@ -146,6 +167,8 @@ for arg in sys.argv:
 			path = genPath(directory)
 		elif '-skip' in arg:
 			skip = True
+		elif 'hi=' in arg:
+			hi = arg.replace('-hi=', '')
 			
 
 torrentName = genTorrentName(directory)
@@ -158,13 +181,15 @@ site = urllib.urlopen(torrentURL)
 text = site.read()
 tList = text.split()
 removeTags(tList)
-urlList = filterURL(tList, SUBTITLE)
+urlList = filterURL(tList, SUBTITLE, hi)
 
 #Find the correct language.
 subURL = []
 for url in urlList:
-	if lang in url[1] or lang == 'all':
-		subURL.append([url[0], 'http://www.subscene.com' + url[1]])
+	if (lang in url[1] or lang == 'all') and len(subURL) < MAXURL:
+		subURL.append([url[0], 'http://www.subscene.com' + url[1], url[2]])
+
+
 
 if len(subURL) == 0:
 	print 'No subtitle available in that language'
@@ -176,7 +201,7 @@ if skip:
 else:
 	subSite = urllib.urlopen(chooseItem(subURL, 'subtitle', True))
 line = (subSite.read()).split()
-urlList = filterURL(line, DOWNLOAD)
+urlList = filterURL(line, DOWNLOAD, hi)
 url = 'http://www.subscene.com' + urlList[0][0] + '0'
 
 #Handle redirects.

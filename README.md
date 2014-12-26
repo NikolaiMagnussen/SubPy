@@ -13,9 +13,9 @@ Run the script from the directory containing the movie. Run with -h/--help to di
 - Display help
 - List all video's in the chosen directory
 - List relevant subtitles so the user can choose
+- Filtering based on "Hearing Impaired" subtitles
 
 ### TODO:
 
 ##### Add support for:
-- Filtering based on "Hearing Impaired" subtitles
 - List the specific subtitle's score.
