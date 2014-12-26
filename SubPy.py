@@ -22,7 +22,6 @@ def wordInList(word, wList):
 	return 0
 
 #Remove all unnecessary strings before and after the  table
->>>>>>> e4a99c7a93bf70e26b537e4c25a921ebe8651425
 def removeTags(siteList):
 	i = 0
 	while 1:
