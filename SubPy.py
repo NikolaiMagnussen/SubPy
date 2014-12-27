@@ -226,6 +226,7 @@ while error:
 
 ziptest = zipfile.ZipFile(path)
 ziptest.extractall(directory)
+ziptest.close()
 os.remove(path)
 
 print "Subtitle downloaded!"
