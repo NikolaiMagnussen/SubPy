@@ -6,7 +6,9 @@ A fast CLI-based script for downloading subtitles from Subscene. Written and tes
 
 ## How to use:
 Can be installed using the ```make install```command. This has only been tested on Linux, and require bash.
+
 The script can be run with ```python SubPy.py```, provided the script is located in the directory. When installed ```SubPy``` can be run regardless of directory.
+
 Run the script from the directory containing the movie, or the ```-dir=```-flag as stated in help. Run with ```-h```/```--help``` to display help.
 
 ### Features
