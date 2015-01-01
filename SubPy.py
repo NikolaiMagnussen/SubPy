@@ -189,8 +189,6 @@ for url in urlList:
 	if (lang in url[1] or lang == 'all') and len(subURL) < MAXURL:
 		subURL.append([url[0], 'http://www.subscene.com' + url[1], url[2]])
 
-
-
 if len(subURL) == 0:
 	print 'No subtitle available in that language'
 	sys.exit()
