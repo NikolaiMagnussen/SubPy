@@ -4,7 +4,7 @@ import urllib, zipfile, os, sys, glob, random
 FORMAT = ['.mp4', '.avi', '.mkv']
 DOWNLOAD = '/subtitle/download'
 SUBTITLE = '/subtitles/'
-MAXURL = 10
+MAXURL = 20
 
 #Specifying variables to be used in the script.
 skip = False
@@ -73,11 +73,15 @@ def filterURL(siteList, phrase, hiFilter):
 
 			#Append subtitle to the list based on hiFilter
 			if title != "":
+				print "HI:Filter is - " + hiFilter
 				if hiFilter == 'off':
+					print "filter off"
 					urlList.append([title, l[6:-2], hi])
 				elif hiFilter == 'on' and hi:
+					print "filter on"
 					urlList.append([title, l[6:-2], hi])
 				elif hiFilter == 'no' and not hi:
+					print "no filter"
 					urlList.append([title, l[6:-2], hi])
 			#Appending download link
 			else:
@@ -151,80 +155,90 @@ def genTorrentName(directory):
 def genTorrentURL(torrentName):
 	return 'http://www.subscene.com/subtitles/release?q=' + torrentName + '&r=true'
 
-###############################
-##### MAIN PART OF SCRIPT #####
-###############################
-for arg in sys.argv:
-	#If help is given as argument, print help and exit.
-	if arg == '-h' or arg == '--help':
-		printHelp()
+def processArgs(args):
+	for arg in args:
+		#If help is given as argument, print help and exit.
+		if arg == '-h' or arg == '--help':
+			printHelp()
+		else:
+		#If any of the other acceptable arguments are given.
+			if '-lang=' in arg:
+				global lang
+				lang = arg.replace('-lang=', '')
+			elif '-dir=' in arg:
+				global path
+				directory = arg.replace('-dir=', '')
+				path = genPath(directory)
+			elif '-skip' in arg:
+				global skip
+				skip = True
+			elif 'hi=' in arg:
+				global hi
+				hi = arg.replace('-hi=', '')
+				print hi
+	
+
+def main():
+	processArgs(sys.argv)
+
+	torrentName = genTorrentName(directory)
+	torrentURL = genTorrentURL(torrentName)
+	
+	print "Searching for: " + lang + ' - "' + torrentName + '"'
+	
+	#Find and add all valid URL's to a list.
+	site = urllib.urlopen(torrentURL)
+	text = site.read()
+	tList = text.split()
+	removeTags(tList)
+	print "Filtering HI: " + hi
+	urlList = filterURL(tList, SUBTITLE, hi)
+	
+	#Find the correct language.
+	subURL = []
+	for url in urlList:
+		if (lang in url[1] or lang == 'all') and len(subURL) < MAXURL:
+			subURL.append([url[0], 'http://www.subscene.com' + url[1], url[2]])
+	
+	if len(subURL) == 0:
+		print 'No subtitle available in that language'
+		sys.exit()
+	
+	#Get download-URL.
+	if skip:
+		subSite = urllib.urlopen(subURL[0][1])
 	else:
-	#If any of the other acceptable arguments are given.
-		if '-lang=' in arg:
-			lang = arg.replace('-lang=', '')
-		elif '-dir=' in arg:
-			directory = arg.replace('-dir=', '')
-			path = genPath(directory)
-		elif '-skip' in arg:
-			skip = True
-		elif 'hi=' in arg:
-			hi = arg.replace('-hi=', '')
-			
+		subSite = urllib.urlopen(chooseItem(subURL, 'subtitle', True))
+	line = (subSite.read()).split()
+	urlList = filterURL(line, DOWNLOAD, hi)
+	url = 'http://www.subscene.com' + urlList[0][0] + '0'
+	
+	#Handle redirects.
+	test = urllib.urlopen(url)
+	url = test.geturl()
+	
+	#Get, unzip and delete.
+	subT = urllib.URLopener()
+	
+	error = True
+	i = 0
+	while error:
+		try:
+			subT.retrieve(url, path)
+			error = False
+		except IOError as e:
+			if i > 50:
+				print("Problems retrieving file from subscene...exiting..")
+				sys.exit()
+			path = path.replace(path[-5:], str(random.randint(10000, 99999)))
+			i += 1
+	
+	ziptest = zipfile.ZipFile(path)
+	ziptest.extractall(directory)
+	ziptest.close()
+	os.remove(path)
+	
+	print "Subtitle downloaded!"
 
-torrentName = genTorrentName(directory)
-torrentURL = genTorrentURL(torrentName)
-
-print "Searching for: " + lang + ' - "' + torrentName + '"'
-
-#Find and add all valid URL's to a list.
-site = urllib.urlopen(torrentURL)
-text = site.read()
-tList = text.split()
-removeTags(tList)
-urlList = filterURL(tList, SUBTITLE, hi)
-
-#Find the correct language.
-subURL = []
-for url in urlList:
-	if (lang in url[1] or lang == 'all') and len(subURL) < MAXURL:
-		subURL.append([url[0], 'http://www.subscene.com' + url[1], url[2]])
-
-if len(subURL) == 0:
-	print 'No subtitle available in that language'
-	sys.exit()
-
-#Get download-URL.
-if skip:
-	subSite = urllib.urlopen(subURL[0][1])
-else:
-	subSite = urllib.urlopen(chooseItem(subURL, 'subtitle', True))
-line = (subSite.read()).split()
-urlList = filterURL(line, DOWNLOAD, hi)
-url = 'http://www.subscene.com' + urlList[0][0] + '0'
-
-#Handle redirects.
-test = urllib.urlopen(url)
-url = test.geturl()
-
-#Get, unzip and delete.
-subT = urllib.URLopener()
-
-error = True
-i = 0
-while error:
-	try:
-		subT.retrieve(url, path)
-		error = False
-	except IOError as e:
-		if i > 50:
-			print("Problems retrieving file from subscene...exiting..")
-			sys.exit()
-		path = path.replace(path[-5:], str(random.randint(10000, 99999)))
-		i += 1
-
-ziptest = zipfile.ZipFile(path)
-ziptest.extractall(directory)
-ziptest.close()
-os.remove(path)
-
-print "Subtitle downloaded!"
+if __name__ == "__main__":
+	main()
