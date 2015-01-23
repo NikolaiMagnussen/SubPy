@@ -174,6 +174,7 @@ def processArgs(args):
 	
 
 def main():
+	global path
 	processArgs(sys.argv)
 
 	torrentName = genTorrentName(directory)
