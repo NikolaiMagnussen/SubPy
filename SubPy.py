@@ -73,15 +73,11 @@ def filterURL(siteList, phrase, hiFilter):
 
 			#Append subtitle to the list based on hiFilter
 			if title != "":
-				print "HI:Filter is - " + hiFilter
 				if hiFilter == 'off':
-					print "filter off"
 					urlList.append([title, l[6:-2], hi])
 				elif hiFilter == 'on' and hi:
-					print "filter on"
 					urlList.append([title, l[6:-2], hi])
 				elif hiFilter == 'no' and not hi:
-					print "no filter"
 					urlList.append([title, l[6:-2], hi])
 			#Appending download link
 			else:
@@ -175,7 +171,6 @@ def processArgs(args):
 			elif 'hi=' in arg:
 				global hi
 				hi = arg.replace('-hi=', '')
-				print hi
 	
 
 def main():
@@ -191,7 +186,6 @@ def main():
 	text = site.read()
 	tList = text.split()
 	removeTags(tList)
-	print "Filtering HI: " + hi
 	urlList = filterURL(tList, SUBTITLE, hi)
 	
 	#Find the correct language.
