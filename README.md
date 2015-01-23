@@ -6,7 +6,7 @@ A fast CLI-based script for downloading subtitles from Subscene. Written and tes
 
 
 ## How to use:
-Make sure you have Python installed. If not, download python 2.7.x [here](https://www.python.org/getit/)
+Make sure you have Python and 'rarfile' installed. If not, download python 2.7.x [here](https://www.python.org/getit/)
 
 Can be installed using the ```make install```command. This has only been tested on Linux, and require bash.
 

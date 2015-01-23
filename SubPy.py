@@ -1,4 +1,4 @@
-import urllib, zipfile, os, sys, glob, random
+import urllib, zipfile, os, sys, glob, random, rarfile
 
 #Specifying formats, and download and subtitle string.
 FORMAT = ['.mp4', '.avi', '.mkv']
@@ -14,6 +14,7 @@ directory = os.getcwd()
 path = directory + '/tmp' + str(random.randint(10000, 99999))
 torrentURL = ""
 torrentName = "<No file>"
+file_list = os.listdir(directory)
 
 #Return 1 if the word is in the list, 0 if not.
 def wordInList(word, wList):
@@ -136,7 +137,7 @@ def chooseItem(iList, iType, nested):
 #Generate torrentName.
 def genTorrentName(directory):
 	tList = []
-	for f in os.listdir(directory):
+	for f in file_list:
 		for  extension in FORMAT:
 			if extension in f:
 				tList.append(f.replace(extension, ''))
@@ -212,7 +213,7 @@ def main():
 	test = urllib.urlopen(url)
 	url = test.geturl()
 	
-	#Get, unzip and delete.
+	#Get, extract and delete.
 	subT = urllib.URLopener()
 	
 	error = True
@@ -227,11 +228,16 @@ def main():
 				sys.exit()
 			path = path.replace(path[-5:], str(random.randint(10000, 99999)))
 			i += 1
-	
-	ziptest = zipfile.ZipFile(path)
-	ziptest.extractall(directory)
-	ziptest.close()
+	try:
+		archive = zipfile.ZipFile(path)
+	except zipfile.BadZipfile:
+		archive = rarfile.RarFile(path)
+	archive.extractall(directory)
+	archive.close()
 	os.remove(path)
+	delta_list = [x for x in  os.listdir(directory) if  x not in file_list and '.srt' not in x ]
+	for f in delta_list:
+		os.remove(directory + '/' + f)
 	
 	print "Subtitle downloaded!"
 
